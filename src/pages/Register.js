@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import './styles.css';
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -22,10 +24,16 @@ const Register = () => {
     try {
       const response = await axios.post("http://localhost/register.php", formData);
       setMessage(response.data.message);
+  
+      if (response.data.success) { // Assuming 'success' is part of your response
+        // Redirect to the login page
+        navigate("/login");
+      }
     } catch (error) {
       setMessage("Error registering user");
     }
   };
+  
 
   return (
     <div>

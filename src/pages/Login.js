@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import './styles.css';
+
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -18,8 +20,17 @@ const Login = () => {
       const response = await axios.post("http://localhost/login.php", formData);
       if (response.data.success) {
         setMessage(`Welcome, ${response.data.user.name}!`);
-          navigate("/events"); // Redirect to the home page
-    ; // Add a slight delay to show the welcome message
+
+        // Store user data in localStorage
+        localStorage.setItem("user_id", response.data.user.id);
+        localStorage.setItem("user_role", response.data.user.role);
+
+        // Redirect based on role
+        if (response.data.user.role === "organizer") {
+          navigate("/dashboard"); // Redirect to organizer dashboard
+        } else {
+          navigate("/events"); // Redirect to regular home page
+        }
       } else {
         setMessage(response.data.message);
       }

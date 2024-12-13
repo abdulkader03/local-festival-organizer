@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import EventDetails from "./pages/EventDetails";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import OrganizerDashboard from "./pages/OrganizerDashboard";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/event/:id" element={<EventDetails />} />
         <Route path="/register" element={<Register />} />
         <Route path="/events" element={<Home />} />
+        <Route path="/dashboard" element={<OrganizerDashboard />} />
       </Routes>
     </BrowserRouter>
   );
