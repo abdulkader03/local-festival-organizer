@@ -53,8 +53,7 @@ const Home = () => {
               <h3>
                 <Link to={`/event/${event.id}`}>{event.title}</Link>
               </h3>
-              <p>{event.description}</p>
-              <p>
+ss              <p>
                 <strong>Date:</strong> {new Date(event.date).toLocaleString()}
               </p>
               <p>

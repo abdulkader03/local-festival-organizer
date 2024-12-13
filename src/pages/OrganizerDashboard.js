@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // For navigation
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import './styles.css';
-
+import "./styles.css";
 
 const OrganizerDashboard = () => {
   const [events, setEvents] = useState([]);
@@ -12,10 +11,13 @@ const OrganizerDashboard = () => {
     date: "",
     location: "",
   });
+  const [visualFile, setVisualFile] = useState(null); // For visual uploads
   const [editEvent, setEditEvent] = useState(null); // Holds the event being edited
+  const [selectedEventAttendees, setSelectedEventAttendees] = useState([]); // Stores attendees
+  const [attendeeModalOpen, setAttendeeModalOpen] = useState(false); // Modal state
   const organizerId = localStorage.getItem("user_id"); // Assuming organizer ID is stored after login
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // For navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -41,8 +43,20 @@ const OrganizerDashboard = () => {
         organizer_id: organizerId,
       });
       if (response.data.success) {
-        setEvents([...events, { ...newEvent, id: response.data.id }]);
+        const eventId = response.data.id;
+
+        // Upload visual if provided
+        if (visualFile) {
+          const formData = new FormData();
+          formData.append("visual", visualFile);
+          formData.append("event_id", eventId);
+
+          await axios.post("http://localhost/upload_visual.php", formData);
+        }
+
+        setEvents([...events, { ...newEvent, id: eventId }]);
         setNewEvent({ title: "", description: "", date: "", location: "" });
+        setVisualFile(null);
         setMessage("Event created successfully!");
       } else {
         setMessage("Error creating event: " + response.data.message);
@@ -58,12 +72,22 @@ const OrganizerDashboard = () => {
     try {
       const response = await axios.post("http://localhost/edit_event.php", editEvent);
       if (response.data.success) {
+        // Upload visual if provided
+        if (visualFile) {
+          const formData = new FormData();
+          formData.append("visual", visualFile);
+          formData.append("event_id", editEvent.id);
+
+          await axios.post("http://localhost/upload_visual.php", formData);
+        }
+
         setEvents(
           events.map((event) =>
             event.id === editEvent.id ? { ...editEvent } : event
           )
         );
         setEditEvent(null);
+        setVisualFile(null);
         setMessage("Event updated successfully!");
       } else {
         setMessage("Error updating event: " + response.data.message);
@@ -74,26 +98,23 @@ const OrganizerDashboard = () => {
     }
   };
 
-  const handleDeleteEvent = async (eventId) => {
+  const handleViewAttendees = async (eventId) => {
     try {
-      const response = await axios.post("http://localhost/delete_event.php", { event_id: eventId });
+      const response = await axios.get(`http://localhost/get_attendees.php?event_id=${eventId}`);
       if (response.data.success) {
-        setEvents(events.filter((event) => event.id !== eventId));
-        setMessage("Event deleted successfully!");
+        setSelectedEventAttendees(response.data.attendees);
+        setAttendeeModalOpen(true); // Open the modal
       } else {
-        setMessage("Error deleting event: " + response.data.message);
+        setMessage("No attendees found for this event.");
       }
     } catch (error) {
-      console.error("Error deleting event:", error);
-      setMessage("An error occurred while deleting the event.");
+      console.error("Error fetching attendees:", error);
+      setMessage("An error occurred while fetching attendees.");
     }
   };
 
   const handleLogout = () => {
-    // Clear session storage or localStorage
-    localStorage.removeItem("user_id");
-    localStorage.removeItem("user_role");
-    // Redirect to the login page
+    localStorage.clear();
     navigate("/login");
   };
 
@@ -101,9 +122,7 @@ const OrganizerDashboard = () => {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Organizer Dashboard</h1>
-        <button onClick={handleLogout} style={{ padding: "10px", cursor: "pointer" }}>
-          Logout
-        </button>
+        <button onClick={handleLogout}>Logout</button>
       </div>
       <h2>Your Events</h2>
       {message && <p>{message}</p>}
@@ -112,7 +131,19 @@ const OrganizerDashboard = () => {
           <li key={event.id}>
             {event.title} - {new Date(event.date).toLocaleString()}
             <button onClick={() => setEditEvent(event)}>Edit</button>
-            <button onClick={() => handleDeleteEvent(event.id)}>Delete</button>
+            <button onClick={() => handleViewAttendees(event.id)}>View Attendees</button>
+            <button
+              onClick={async () => {
+                try {
+                  await axios.post("http://localhost/delete_event.php", { event_id: event.id });
+                  setEvents(events.filter((e) => e.id !== event.id));
+                } catch (error) {
+                  console.error("Error deleting event:", error);
+                }
+              }}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>
@@ -160,13 +191,33 @@ const OrganizerDashboard = () => {
           }
           required
         />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setVisualFile(e.target.files[0])}
+        />
         <button type="submit">{editEvent ? "Update Event" : "Create Event"}</button>
-        {editEvent && (
-          <button type="button" onClick={() => setEditEvent(null)}>
-            Cancel
-          </button>
-        )}
       </form>
+
+      {attendeeModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Attendees</h2>
+            {selectedEventAttendees.length > 0 ? (
+              <ul>
+                {selectedEventAttendees.map((attendee, index) => (
+                  <li key={index}>
+                    {attendee.name} ({attendee.email})
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No attendees found.</p>
+            )}
+            <button onClick={() => setAttendeeModalOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

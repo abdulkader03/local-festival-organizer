@@ -193,4 +193,119 @@ body {
     padding: 8px 15px;
     font-size: 0.9rem;
   }
+
+  
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+    color: #333; /* Dark text for better contrast */
+    font-family: Arial, sans-serif;
+  }
+  
+  .modal-content h2 {
+    color: #000; /* Ensure header text is visible */
+    margin-bottom: 20px;
+  }
+  
+  .modal-content ul {
+    list-style-type: none;
+    padding: 0;
+    color: #555; /* Slightly lighter but still readable */
+  }
+  
+  .modal-content ul li {
+    margin: 5px 0;
+  }
+  
+  .modal-content button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #8e44ad, #3498db);
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+  
+  .modal-content button:hover {
+    background: linear-gradient(90deg, #3498db, #8e44ad);
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+
+
+  .event-details {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(40, 42, 54, 0.9);
+    border-radius: 12px;
+    color: #f8f8f2;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+  }
+  
+  .event-title {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #ff79c6;
+  }
+  
+  .event-description {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  
+  .event-visual-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .event-visual {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .rsvp-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #6272a4, #bd93f9);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .rsvp-button:hover {
+    background: linear-gradient(135deg, #50fa7b, #ff79c6);
+    transform: translateY(-3px);
+  }
+  
+  .event-message {
+    margin-top: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+  }
   
